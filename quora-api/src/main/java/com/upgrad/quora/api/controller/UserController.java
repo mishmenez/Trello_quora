@@ -16,38 +16,38 @@ import java.util.UUID;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserBusinessService userBusinessService;
+  @Autowired
+  private UserBusinessService userBusinessService;
 
-    @GetMapping
-    public String getUser() {
-        return "Hello User";
-    }
-
-
-    @RequestMapping(method = RequestMethod.POST, path = "signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignupUserResponse> signup(@RequestBody SignupUserRequest signupUserRequest) {
+  @GetMapping
+  public String getUser() {
+    return "Hello User";
+  }
 
 
-        final UserEntity userEntity = new UserEntity();
+  @RequestMapping(method = RequestMethod.POST, path = "signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<SignupUserResponse> signup(@RequestBody SignupUserRequest signupUserRequest) {
 
-        userEntity.setUuid(UUID.randomUUID().toString());
-        userEntity.setFirstname(signupUserRequest.getFirstName());
-        userEntity.setLastname(signupUserRequest.getLastName());
-        userEntity.setUsername(signupUserRequest.getUserName());
-        userEntity.setEmail(signupUserRequest.getEmailAddress());
-        userEntity.setPassword(signupUserRequest.getPassword());
-        userEntity.setCountry(signupUserRequest.getCountry());
-        userEntity.setAboutme(signupUserRequest.getAboutMe());
-        userEntity.setDob(signupUserRequest.getDob());
-        userEntity.setRole("nonadmin");
-        userEntity.setContactnumber(signupUserRequest.getContactNumber());
 
-        final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
+    final UserEntity userEntity = new UserEntity();
 
-        SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER REGISTERED SUCCESSFULLY");
+    userEntity.setUuid(UUID.randomUUID().toString());
+    userEntity.setFirstname(signupUserRequest.getFirstName());
+    userEntity.setLastname(signupUserRequest.getLastName());
+    userEntity.setUsername(signupUserRequest.getUserName());
+    userEntity.setEmail(signupUserRequest.getEmailAddress());
+    userEntity.setPassword(signupUserRequest.getPassword());
+    userEntity.setCountry(signupUserRequest.getCountry());
+    userEntity.setAboutme(signupUserRequest.getAboutMe());
+    userEntity.setDob(signupUserRequest.getDob());
+    userEntity.setRole("nonadmin");
+    userEntity.setContactnumber(signupUserRequest.getContactNumber());
 
-        return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
+    final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
 
-    }
+    SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER REGISTERED SUCCESSFULLY");
+
+    return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
+
+  }
 }

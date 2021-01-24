@@ -10,18 +10,18 @@ import javax.transaction.Transactional;
 @Service
 public class UserBusinessService {
 
-    @Autowired
-    private UserDao userDao;
+  @Autowired
+  private UserDao userDao;
 
-    @Autowired
-    private PasswordCryptographyProvider cryptographyProvider;
+  @Autowired
+  private PasswordCryptographyProvider cryptographyProvider;
 
-    @Transactional
-    public UserEntity signup(UserEntity userEntity) {
-        String[] encryptedText = cryptographyProvider.encrypt(userEntity.getPassword());
-        userEntity.setSalt(encryptedText[0]);
-        userEntity.setPassword(encryptedText[1]);
+  @Transactional
+  public UserEntity signup(UserEntity userEntity) {
+    String[] encryptedText = cryptographyProvider.encrypt(userEntity.getPassword());
+    userEntity.setSalt(encryptedText[0]);
+    userEntity.setPassword(encryptedText[1]);
 
-        return userDao.createUser(userEntity);
-    }
+    return userDao.createUser(userEntity);
+  }
 }
