@@ -10,15 +10,15 @@ import javax.persistence.PersistenceContext;
 @Repository
 public class UserDao {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-    public UserEntity createUser(UserEntity userEntity) {
-        entityManager.persist(userEntity);
-        return userEntity;
-    }
+  public UserEntity createUser(UserEntity userEntity) {
+    entityManager.persist(userEntity);
+    return userEntity;
+  }
 
-    public UserEntity getUserByUsername(final String username) {
-        return entityManager.createNamedQuery("userByUsername", UserEntity.class).setParameter("username", username).getSingleResult();
-    }
+  public UserEntity getUserByUsername(final String username) {
+    return entityManager.createNamedQuery("userByUsername", UserEntity.class).setParameter("username", username).getSingleResult();
+  }
 }
