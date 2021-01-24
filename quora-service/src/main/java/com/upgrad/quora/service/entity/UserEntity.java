@@ -7,7 +7,16 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
+@NamedQueries({
+        @NamedQuery(name = "userByUsername", query = "select u from UserEntity u where u.username = :username"),
+        @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid = :uuid"),
+        @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email = :email"),
+        @NamedQuery(name = "deleteUserById", query = "delete UserEntity u where u.uuid = :uuid")
+})
+
+
 public class UserEntity implements Serializable {
 
     private static final long serialVersionUID = 7850692963715351424L;
