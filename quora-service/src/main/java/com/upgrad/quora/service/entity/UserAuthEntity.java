@@ -5,7 +5,6 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-@Entity(name = "user_auth")
 @Entity
 @Table(name = "user_auth")
 public class UserAuthEntity implements Serializable {
