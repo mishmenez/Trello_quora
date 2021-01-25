@@ -1,11 +1,13 @@
 package com.upgrad.quora.service.dao;
 
+import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import org.springframework.stereotype.Repository;
-import com.upgrad.quora.service.entity.UserAuthEntity;
+
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import java.time.ZonedDateTime;
 
 
 @Repository
@@ -60,6 +62,24 @@ public class UserDao {
     } catch (NoResultException nre) {
       return false;
     }
+  }
 
+  public UserAuthEntity getUserAuthByToken(final String accessToken) {
+    try {
+      UserAuthEntity authEntity = entityManager.createNamedQuery("userAuthByToken", UserAuthEntity.class)
+              .setParameter("token", accessToken)
+              .getSingleResult();
+
+      return authEntity;
+    } catch (NoResultException nre) {
+      return null;
+    }
+  }
+
+  public void updateUserLogoutByToken(final String accessToken, final ZonedDateTime logoutAt) {
+    entityManager.createNamedQuery("updateLogoutByToken" )
+            .setParameter("token", accessToken)
+            .setParameter("logoutAt", logoutAt)
+            .executeUpdate();
   }
 }
