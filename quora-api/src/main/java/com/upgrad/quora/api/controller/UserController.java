@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.upgrad.quora.service.exception.SignUpRestrictedException;
-import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -50,7 +48,7 @@ public class UserController {
 
 
   @RequestMapping(method = RequestMethod.POST, path = "signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<SignupUserResponse> signup(@RequestBody SignupUserRequest signupUserRequest) throws SignUpRestrictedException {
+  public ResponseEntity<SignupUserResponse> signup(@RequestBody SignupUserRequest signupUserRequest) {
 
 
     final UserEntity userEntity = new UserEntity();
@@ -67,24 +65,11 @@ public class UserController {
     userEntity.setRole("nonadmin");
     userEntity.setContactnumber(signupUserRequest.getContactNumber());
 
-
-
     final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
-
-    userEntity.setUuid(UUID.randomUUID().toString());
-    userEntity.setFirstname(signupUserRequest.getFirstName());
-    userEntity.setLastname(signupUserRequest.getLastName());
-    userEntity.setUsername(signupUserRequest.getUserName());
-    userEntity.setEmail(signupUserRequest.getEmailAddress());
-    userEntity.setPassword(signupUserRequest.getPassword());
-    userEntity.setCountry(signupUserRequest.getCountry());
-    userEntity.setAboutme(signupUserRequest.getAboutMe());
-    userEntity.setDob(signupUserRequest.getDob());
-    userEntity.setRole("nonadmin");
-    userEntity.setContactnumber(signupUserRequest.getContactNumber());
 
     SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
 
+    return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
 
   }
 }
