@@ -1,19 +1,16 @@
 package com.upgrad.quora.service.business;
 
 import com.upgrad.quora.service.dao.UserDao;
+import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
+import com.upgrad.quora.service.exception.*;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.upgrad.quora.service.entity.UserAuthEntity;
-import com.upgrad.quora.service.exception.AuthenticationFailedException;
-import com.upgrad.quora.service.exception.SignUpRestrictedException;
-import com.upgrad.quora.service.exception.UserNotFoundException;
-import org.hibernate.exception.ConstraintViolationException;
-
-import java.time.ZonedDateTime;
-import java.util.UUID;
 
 import javax.transaction.Transactional;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Service
 public class UserBusinessService {
@@ -35,6 +32,31 @@ public class UserBusinessService {
   }
 
 
+
+  public UserAuthEntity getUserByToken(final String accessToken) throws AuthorizationFailedException {
+    UserAuthEntity userAuthByToken = userDao.getUserAuthByToken(accessToken);
+
+    if(userAuthByToken == null) {
+      throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+    }
+
+    if(userAuthByToken.getLogoutAt() != null) {
+      throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
+    }
+
+    return userAuthByToken;
+  }
+
+
+  public UserEntity getUserProfile(final String userUuid, final String accessToken) throws AuthorizationFailedException, UserNotFoundException {
+
+    getUserByToken(accessToken);
+    UserEntity userById = getUserById(userUuid);
+
+    return userById;
+  }
+
+
   @Transactional
   public UserEntity signup(UserEntity userEntity) throws SignUpRestrictedException {
 
@@ -52,7 +74,7 @@ public class UserBusinessService {
 
     UserEntity signUpUser = userDao.createUser(userEntity);
 
-    System.out.println("GET USER NAME >>>> " + signUpUser.getUsername());
+    //System.out.println("GET USER NAME >>>> " + signUpUser.getUsername());
 
     return signUpUser;
   }
@@ -85,5 +107,39 @@ public class UserBusinessService {
     } else {
       throw new AuthenticationFailedException("ATH-002", "Password failed");
     }
+  }
+
+  @Transactional
+  public String signout(final String accessToken) throws SignOutRestrictedException {
+    ZonedDateTime currentTime = ZonedDateTime.now();
+    UserAuthEntity userAuthEntity = userDao.getUserAuthByToken(accessToken);
+
+    if(userAuthEntity == null) {
+      throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
+    }
+
+    userDao.updateUserLogoutByToken(accessToken, currentTime);
+
+    return userAuthEntity.getUserId().getUuid();
+  }
+
+
+  public boolean isUserSignedIn(UserAuthEntity userAuthTokenEntity) {
+    boolean isUserSignedIn = false;
+    if (userAuthTokenEntity != null && userAuthTokenEntity.getLoginAt() != null && userAuthTokenEntity.getExpiresAt() != null) {
+      if ((userAuthTokenEntity.getLogoutAt() == null)) {
+        isUserSignedIn = true;
+      }
+    }
+    return isUserSignedIn;
+  }
+
+
+  public boolean isUserAdmin(UserEntity user) {
+    boolean isUserAdmin = false;
+    if (user != null && "admin".equals(user.getRole())) {
+      isUserAdmin = true;
+    }
+    return isUserAdmin;
   }
 }
